@@ -3,8 +3,6 @@ const del = require('del');
 const gulp = require("gulp");
 const babel = require('gulp-babel');
 const shell = require('gulp-shell');
-const watch = require('gulp-watch');
-const plumber = require('gulp-plumber');
 
 //-----------
 // Tasks
@@ -18,13 +16,16 @@ gulp.task("clean", () => {
 });
 
 gulp.task('babel', ['clean'], () =>
-    watch('src/**/*.js', { ignoreInitial: false })
-        .pipe(plumber())
+    gulp.src('src/**/*.js', { ignoreInitial: false })
         .pipe(babel({
             presets: ['es2015']
         }))
         .pipe(gulp.dest('dist'))
 );
+
+gulp.task('watch', () => {
+    gulp.watch('src/**/*.js', ['babel']);
+});
 
 gulp.task("copy-node-modules", ["clean-node_modules"], () => {
     return gulp.src("node_modules/**/*")
