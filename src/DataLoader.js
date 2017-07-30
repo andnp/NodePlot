@@ -1,12 +1,31 @@
 import csv from 'csv';
 import fs from 'fs';
-import { promisify } from 'utils/PromiseUtil.js';
+import Promise from 'bluebird';
 
-const readFilePromise = promisify.bind(null, fs.readFile);
-const csvParse = promisify.bind(null, csv.parse);
+import Operations from 'Operation';
 
-readFilePromise('test.csv')
-    .then(csvParse)
-    .then((csv_string) => {
-        console.log(csv_string)
-    })
+const readFilePromise = Promise.promisify(fs.readFile);
+const csvParse = Promise.promisify(csv.parse);
+
+Operations.createOperation('FileLoader', [], 'raw', (data) => {
+    return readFilePromise(data.location);
+});
+
+Operations.createOperation('CSVReader', ['raw'], 'raw_set', (data) => {
+    return csvParse(data.raw);
+});
+
+Operations.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'cols'], (data) => {
+    const matrix = data.raw_set;
+    const newMatrix = [];
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    for (let i = 0; i < rows; ++i) {
+        const rowdat = [];
+        for (let j = 0; j < cols; ++j) {
+            rowdat.push(parseFloat(matrix[i][j]));
+        }
+        newMatrix.push(rowdat);
+    }
+    return [newMatrix, rows, cols];
+});
