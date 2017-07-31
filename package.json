@@ -4,9 +4,7 @@
     "start": "NODE_PATH=dist node dist/app.js",
     "coverage": "NODE_PATH=src BABEL_ENV=test nyc --check-coverage --lines 95 ava",
     "lint": "node_modules/eslint/bin/eslint.js . --ext .js",
-    "test": "NODE_PATH=src BABEL_ENV=test ava",
-    "postinstall": "gulp copy-node-modules",
-    "postuninstall": "gulp copy-node-modules"
+    "test": "NODE_PATH=src BABEL_ENV=test ava"
   },
   "pre-push": [
     "lint",
@@ -37,6 +35,7 @@
   },
   "nyc": {
     "exclude": [
+      "src/plotters",
       "tests",
       "node_modules"
     ]
@@ -56,5 +55,26 @@
       ],
       "babelrc": true
     }
-  }
+  },
+  "name": "nodeplot",
+  "version": "0.0.1",
+  "description": "A server-side plotting utility currently focused around phantomjs and plotly",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andnp/NodePlot.git"
+  },
+  "keywords": [
+    "plotly",
+    "nodejs"
+  ],
+  "author": "Andy Patterson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andnp/NodePlot/issues"
+  },
+  "homepage": "https://github.com/andnp/NodePlot#readme"
 }
