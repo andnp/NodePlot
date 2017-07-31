@@ -1,7 +1,18 @@
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 const Operations = {};
 const ExportTypes = {};
+
+const addReturn = (data, type, ret) => {
+    if (type === '') return;
+    if (type === 'chart') {
+        if (_.isUndefined(data[type])) data[type] = [];
+        data[type].push(ret);
+    } else {
+        data[type] = ret;
+    }
+}
 
 Operations.createOperation = (name, deps, exportTypes, opfunc) => {
     if (typeof exportTypes !== 'object') exportTypes = [exportTypes];
@@ -26,11 +37,11 @@ Operations.createOperation = (name, deps, exportTypes, opfunc) => {
             // If there are multiple return values, grab each and add it to the data object
             if (exportTypes.length > 1) {
                 exportTypes.forEach((type, i) => {
-                    data[type] = op_values[i];
+                    addReturn(data, type, op_values[i]);
                 });
             } else {
                 const type = exportTypes[0];
-                data[type] = op_values;
+                addReturn(data, type, op_values);
             }
 
             return data;

@@ -4,3 +4,4 @@ dist
 test.csv
 .nyc_output
 coverage/
+plots/
