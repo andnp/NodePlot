@@ -76,3 +76,22 @@ test(`LoadGlob reads in all files in glob`, async t => {
 
     t.true(files.map.length > 0);
 });
+
+// Should be able to write a matrix then read it back again.
+test(`WriteCSV writes a matrix to a csv file`, async t => {
+    const matrix = [
+        [1, 2, 3],
+        [4, 5, 6]
+    ];
+
+    const data = {matrix};
+    await Operations.WriteCSV(data, 'TEST_FILE.csv');
+    const result = {
+        location: 'TEST_FILE.csv'
+    };
+    await Operations.FileLoader(result)
+    .then(Operations.CSVReader)
+    .then(Operations.NumericMatrix);
+
+    t.deepEqual(matrix, result.matrix);
+});

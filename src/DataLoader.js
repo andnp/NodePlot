@@ -5,8 +5,10 @@ import Promise from 'bluebird';
 import Glob from 'glob';
 
 import Operations from '~/Operation';
+import MatDash from '~/utils/MatrixUtils';
 
 const readFilePromise = Promise.promisify(fs.readFile);
+const writeFilePromise = Promise.promisify(fs.writeFile);
 const csvParse = Promise.promisify(csv.parse);
 const globPromise = Promise.promisify(Glob);
 
@@ -42,4 +44,18 @@ Operations.createOperation('ReadGlob', [], 'map', async (data) => {
         obj.location = file;
         return obj;
     });
+});
+
+Operations.createOperation('WriteCSV', ['matrix'], '', async (data, file) => {
+    let str = '';
+    const matrix = data.matrix;
+    const { rows, cols } = MatDash.dims(matrix);
+    for (let i = 0; i < rows; ++i) {
+        for (let j = 0; j < cols; ++j) {
+            str += `${matrix[i][j]}${j === cols-1 ? '' : ','}`;
+        }
+        str += '\n';
+    }
+
+    return writeFilePromise(file, str);
 });
