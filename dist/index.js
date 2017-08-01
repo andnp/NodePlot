@@ -14,6 +14,8 @@ require('./Aggregates');
 
 require('./LinePlots');
 
+require('./Control');
+
 require('./plotters/LocalPlotter');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
