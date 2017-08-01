@@ -17,7 +17,10 @@ Operations.createOperation('FileLoader', [], 'raw', (data) => {
 });
 
 Operations.createOperation('CSVReader', ['raw'], 'raw_set', (data) => {
-    return csvParse(data.raw);
+    return csvParse(data.raw, {
+        auto_parse: true,
+        trim: true
+    });
 });
 
 Operations.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'cols'], (data) => {

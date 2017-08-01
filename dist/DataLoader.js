@@ -40,7 +40,10 @@ _Operation2.default.createOperation('FileLoader', [], 'raw', function (data) {
 });
 
 _Operation2.default.createOperation('CSVReader', ['raw'], 'raw_set', function (data) {
-    return csvParse(data.raw);
+    return csvParse(data.raw, {
+        auto_parse: true,
+        trim: true
+    });
 });
 
 _Operation2.default.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'cols'], function (data) {
