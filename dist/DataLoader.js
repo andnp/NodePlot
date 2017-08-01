@@ -20,7 +20,7 @@ var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
 
-var _Operation = require('Operation');
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 

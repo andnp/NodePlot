@@ -1,5 +1,5 @@
-import Operations from 'Operation';
-import MatDash from 'utils/MatrixUtils';
+import Operations from '~/Operation';
+import MatDash from '~/utils/MatrixUtils';
 
 Operations.createOperation('HorizontalAverage', ['matrix', 'rows', 'cols'], 'horizontal_averages', (data) => {
     const { matrix, rows, cols } = data;

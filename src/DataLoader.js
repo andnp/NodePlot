@@ -4,7 +4,7 @@ import fs from 'fs';
 import Promise from 'bluebird';
 import Glob from 'glob';
 
-import Operations from 'Operation';
+import Operations from '~/Operation';
 
 const readFilePromise = Promise.promisify(fs.readFile);
 const csvParse = Promise.promisify(csv.parse);

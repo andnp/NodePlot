@@ -1,5 +1,5 @@
-import Operations from 'Operation';
-import LocalPlotter from 'plotters/LocalPlotter';
+import Operations from '~/Operation';
+import LocalPlotter from '~/plotters/LocalPlotter';
 
 Operations.createOperation('SavePNG', ['chart'], '', async (data) => {
     const promises = data.chart.map((chart) => {

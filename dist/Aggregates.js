@@ -1,10 +1,10 @@
 'use strict';
 
-var _Operation = require('Operation');
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 
-var _MatrixUtils = require('utils/MatrixUtils');
+var _MatrixUtils = require('./utils/MatrixUtils');
 
 var _MatrixUtils2 = _interopRequireDefault(_MatrixUtils);
 

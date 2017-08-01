@@ -4,15 +4,15 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _MatrixUtils = require('utils/MatrixUtils');
-
-var _MatrixUtils2 = _interopRequireDefault(_MatrixUtils);
-
 var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _Operation = require('Operation');
+var _MatrixUtils = require('./utils/MatrixUtils');
+
+var _MatrixUtils2 = _interopRequireDefault(_MatrixUtils);
+
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 

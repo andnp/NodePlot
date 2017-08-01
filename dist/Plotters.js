@@ -1,10 +1,10 @@
 'use strict';
 
-var _Operation = require('Operation');
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 
-var _LocalPlotter = require('plotters/LocalPlotter');
+var _LocalPlotter = require('./plotters/LocalPlotter');
 
 var _LocalPlotter2 = _interopRequireDefault(_LocalPlotter);
 

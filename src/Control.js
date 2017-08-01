@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import MatDash from 'utils/MatrixUtils';
 import Promise from 'bluebird';
 
-import Operations from 'Operation';
+import MatDash from '~/utils/MatrixUtils';
+import Operations from '~/Operation';
 
 Operations.createOperation('Map', ['map'], 'map', (data, op) => {
     const array = data.map;

@@ -1,4 +1,4 @@
-import Operations from 'Operation';
+import Operations from '~/Operation';
 import _ from 'lodash';
 
 Operations.createOperation('LinePlot', ['array'], 'chart', async (data, name = 'line_plot') => {

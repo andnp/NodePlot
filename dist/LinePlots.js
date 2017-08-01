@@ -1,6 +1,6 @@
 'use strict';
 
-var _Operation = require('Operation');
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 
