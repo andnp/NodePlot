@@ -3,9 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-var forEach = function forEach(matrix, f) {
+var dims = function dims(matrix) {
     var rows = matrix.length;
     var cols = matrix[0].length;
+    return { rows: rows, cols: cols };
+};
+
+var forEach = function forEach(matrix, f) {
+    var _dims = dims(matrix),
+        rows = _dims.rows,
+        cols = _dims.cols;
+
     for (var i = 0; i < rows; ++i) {
         for (var j = 0; j < cols; ++j) {
             f(matrix[i][j], i, j);
@@ -24,8 +32,10 @@ var makeArray = function makeArray(size) {
 };
 
 var iterateColumns = function iterateColumns(matrix, f) {
-    var rows = matrix.length;
-    var cols = matrix[0].length;
+    var _dims2 = dims(matrix),
+        rows = _dims2.rows,
+        cols = _dims2.cols;
+
     for (var j = 0; j < cols; ++j) {
         var col = [];
         for (var i = 0; i < rows; ++i) {
@@ -36,8 +46,10 @@ var iterateColumns = function iterateColumns(matrix, f) {
 };
 
 var iterateRows = function iterateRows(matrix, f) {
-    var rows = matrix.length;
-    var cols = matrix[0].length;
+    var _dims3 = dims(matrix),
+        rows = _dims3.rows,
+        cols = _dims3.cols;
+
     for (var i = 0; i < rows; ++i) {
         var row = [];
         for (var j = 0; j < cols; ++j) {
@@ -49,8 +61,11 @@ var iterateRows = function iterateRows(matrix, f) {
 
 var transpose = function transpose(matrix) {
     var trans = [];
-    var rows = matrix.length;
-    var cols = matrix[0].length;
+
+    var _dims4 = dims(matrix),
+        rows = _dims4.rows,
+        cols = _dims4.cols;
+
     for (var j = 0; j < cols; ++j) {
         var col = [];
         for (var i = 0; i < rows; ++i) {
@@ -62,6 +77,7 @@ var transpose = function transpose(matrix) {
 };
 
 exports.default = {
+    dims: dims,
     forEach: forEach,
     makeArray: makeArray,
     iterateColumns: iterateColumns,

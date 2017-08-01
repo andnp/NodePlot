@@ -1,6 +1,11 @@
-const forEach = (matrix, f) => {
+const dims = (matrix) => {
     const rows = matrix.length;
     const cols = matrix[0].length;
+    return {rows, cols};
+};
+
+const forEach = (matrix, f) => {
+    const { rows, cols } = dims(matrix);
     for (let i = 0; i < rows; ++i) {
         for (let j = 0; j < cols; ++j) {
             f(matrix[i][j], i, j);
@@ -17,8 +22,7 @@ const makeArray = (size, v=0) => {
 };
 
 const iterateColumns = (matrix, f) => {
-    const rows = matrix.length;
-    const cols = matrix[0].length;
+    const { rows, cols } = dims(matrix);
     for (let j = 0; j < cols; ++j) {
         const col = [];
         for (let i = 0; i < rows; ++i) {
@@ -29,8 +33,7 @@ const iterateColumns = (matrix, f) => {
 };
 
 const iterateRows = (matrix, f) => {
-    const rows = matrix.length;
-    const cols = matrix[0].length;
+    const { rows, cols } = dims(matrix);
     for (let i = 0; i < rows; ++i) {
         const row = [];
         for (let j = 0; j < cols; ++j) {
@@ -42,8 +45,7 @@ const iterateRows = (matrix, f) => {
 
 const transpose = (matrix) => {
     const trans = [];
-    const rows = matrix.length;
-    const cols = matrix[0].length;
+    const { rows, cols } = dims(matrix);
     for (let j = 0; j < cols; ++j) {
         const col = [];
         for (let i = 0; i < rows; ++i) {
@@ -55,6 +57,7 @@ const transpose = (matrix) => {
 }
 
 export default {
+    dims,
     forEach,
     makeArray,
     iterateColumns,

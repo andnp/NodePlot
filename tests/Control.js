@@ -51,6 +51,8 @@ test(`Append column takes mapped matrices and outputs a single data object with 
     await Operations.AppendColumn(data);
 
     t.deepEqual(data.matrix, expected);
+    t.is(data.rows, 2);
+    t.is(data.cols, 6);
 });
 
 // Should be able append matrices by row
@@ -81,4 +83,6 @@ test(`Append row takes mapped matrices and outputs a single data object with mat
     await Operations.AppendRow(data);
 
     t.deepEqual(data.matrix, expected);
+    t.is(data.rows, 4);
+    t.is(data.cols, 3);
 });

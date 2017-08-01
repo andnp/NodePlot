@@ -10,7 +10,7 @@ Operations.createOperation('Map', ['map'], 'map', (data, op) => {
     return Promise.all(promises);
 });
 
-Operations.createOperation('AppendColumn', ['map'], 'matrix', (data) => {
+Operations.createOperation('AppendColumn', ['map'], ['matrix', 'rows', 'cols'], (data) => {
     const array = data.map;
     const matrix = [];
     array.forEach((d) => {
@@ -18,15 +18,17 @@ Operations.createOperation('AppendColumn', ['map'], 'matrix', (data) => {
     });
 
     const trans = MatDash.transpose(matrix);
-    return trans;
+    const { rows, cols } = MatDash.dims(trans);
+    return [trans, rows, cols];
 });
 
-Operations.createOperation('AppendRow', ['map'], 'matrix', (data) => {
+Operations.createOperation('AppendRow', ['map'], ['matrix', 'rows', 'cols'], (data) => {
     const array = data.map;
     const matrix = [];
     array.forEach((d) => {
         MatDash.iterateRows(d.matrix, (row) => matrix.push(row));
     });
 
-    return matrix;
+    const { rows, cols } = MatDash.dims(matrix);
+    return [matrix, rows, cols];
 });

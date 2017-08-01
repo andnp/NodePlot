@@ -26,7 +26,7 @@ _Operation2.default.createOperation('Map', ['map'], 'map', function (data, op) {
     return _bluebird2.default.all(promises);
 });
 
-_Operation2.default.createOperation('AppendColumn', ['map'], 'matrix', function (data) {
+_Operation2.default.createOperation('AppendColumn', ['map'], ['matrix', 'rows', 'cols'], function (data) {
     var array = data.map;
     var matrix = [];
     array.forEach(function (d) {
@@ -36,10 +36,15 @@ _Operation2.default.createOperation('AppendColumn', ['map'], 'matrix', function 
     });
 
     var trans = _MatrixUtils2.default.transpose(matrix);
-    return trans;
+
+    var _MatDash$dims = _MatrixUtils2.default.dims(trans),
+        rows = _MatDash$dims.rows,
+        cols = _MatDash$dims.cols;
+
+    return [trans, rows, cols];
 });
 
-_Operation2.default.createOperation('AppendRow', ['map'], 'matrix', function (data) {
+_Operation2.default.createOperation('AppendRow', ['map'], ['matrix', 'rows', 'cols'], function (data) {
     var array = data.map;
     var matrix = [];
     array.forEach(function (d) {
@@ -48,5 +53,9 @@ _Operation2.default.createOperation('AppendRow', ['map'], 'matrix', function (da
         });
     });
 
-    return matrix;
+    var _MatDash$dims2 = _MatrixUtils2.default.dims(matrix),
+        rows = _MatDash$dims2.rows,
+        cols = _MatDash$dims2.cols;
+
+    return [matrix, rows, cols];
 });
