@@ -4,17 +4,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _Operation = require('Operation');
+var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
 
-require('DataLoader');
+require('./DataLoader');
 
-require('Aggregates');
+require('./Aggregates');
 
-require('LinePlots');
+require('./LinePlots');
 
-require('plotters/LocalPlotter');
+require('./plotters/LocalPlotter');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
