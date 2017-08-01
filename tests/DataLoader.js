@@ -63,3 +63,16 @@ test(`Load file, parse csv, parse floats`, async t => {
         .then(Operations.NumericMatrix)
         .then((data) => checkTestFile(t, data))
 });
+
+// Should be able to load a glob into an array of data objects. This must be the first operation in chain
+test(`LoadGlob reads in all files in glob`, async t => {
+    const files = await Operations.ReadGlob({
+        location: '*.js'
+    });
+
+    files.map.map((data) => {
+        t.true(data.location.length > 0)
+    });
+
+    t.true(files.map.length > 0);
+});

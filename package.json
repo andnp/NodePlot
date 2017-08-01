@@ -15,6 +15,7 @@
     "csv": "^1.1.1",
     "d3": "^3.5.17",
     "dimple-js": "^2.1.4",
+    "glob": "^7.1.2",
     "image-data-uri": "^1.0.0",
     "lodash": "^4.17.4",
     "phantom": "^4.0.5",
@@ -59,7 +60,7 @@
   "name": "nodeplot",
   "version": "0.0.1",
   "description": "A server-side plotting utility currently focused around phantomjs and plotly",
-  "main": "index.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "tests"
   },

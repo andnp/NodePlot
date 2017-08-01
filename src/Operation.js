@@ -9,9 +9,14 @@ const addReturn = (data, type, ret) => {
     if (type === 'chart') {
         if (_.isUndefined(data[type])) data[type] = [];
         data[type].push(ret);
+    } else if (type === 'map') {
+        data = {};
+        data.map = ret;
     } else {
         data[type] = ret;
     }
+
+    return data;
 }
 
 Operations.createOperation = (name, deps, exportTypes, opfunc) => {
@@ -37,11 +42,11 @@ Operations.createOperation = (name, deps, exportTypes, opfunc) => {
             // If there are multiple return values, grab each and add it to the data object
             if (exportTypes.length > 1) {
                 exportTypes.forEach((type, i) => {
-                    addReturn(data, type, op_values[i]);
+                    data = addReturn(data, type, op_values[i]);
                 });
             } else {
                 const type = exportTypes[0];
-                addReturn(data, type, op_values);
+                data = addReturn(data, type, op_values);
             }
 
             return data;

@@ -1,11 +1,14 @@
+import _ from 'lodash';
 import csv from 'csv';
 import fs from 'fs';
 import Promise from 'bluebird';
+import Glob from 'glob';
 
 import Operations from 'Operation';
 
 const readFilePromise = Promise.promisify(fs.readFile);
 const csvParse = Promise.promisify(csv.parse);
+const globPromise = Promise.promisify(Glob);
 
 Operations.createOperation('FileLoader', [], 'raw', (data) => {
     return readFilePromise(data.location);
@@ -28,4 +31,15 @@ Operations.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'col
         newMatrix.push(rowdat);
     }
     return [newMatrix, rows, cols];
+});
+
+Operations.createOperation('ReadGlob', [], 'map', async (data) => {
+    const glob = data.location;
+
+    const files = await globPromise(glob);
+    return files.map((file) => {
+        const obj = _.cloneDeep(data);
+        obj.location = file;
+        return obj;
+    });
 });
