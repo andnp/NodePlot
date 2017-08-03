@@ -43,6 +43,21 @@ _Operation2.default.createOperation('CSVReader', ['raw'], 'raw_set', function (d
     return csvParse(data.raw, {
         auto_parse: true,
         trim: true
+        // filter out any artifacts due to trailing commas
+    }).then(function (csv_matrix) {
+        var _MatDash$dims = _MatrixUtils2.default.dims(csv_matrix),
+            rows = _MatDash$dims.rows,
+            cols = _MatDash$dims.cols;
+
+        var mat = [];
+        for (var i = 0; i < rows; ++i) {
+            var row = [];
+            for (var j = 0; j < cols; ++j) {
+                if (!(j === cols - 1 && csv_matrix[i][j] === '')) row.push(csv_matrix[i][j]);
+            }
+            mat.push(row);
+        }
+        return mat;
     });
 });
 
@@ -76,9 +91,9 @@ _Operation2.default.createOperation('WriteCSV', ['matrix'], '', async function (
     var str = '';
     var matrix = data.matrix;
 
-    var _MatDash$dims = _MatrixUtils2.default.dims(matrix),
-        rows = _MatDash$dims.rows,
-        cols = _MatDash$dims.cols;
+    var _MatDash$dims2 = _MatrixUtils2.default.dims(matrix),
+        rows = _MatDash$dims2.rows,
+        cols = _MatDash$dims2.cols;
 
     for (var i = 0; i < rows; ++i) {
         for (var j = 0; j < cols; ++j) {

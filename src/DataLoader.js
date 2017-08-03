@@ -20,6 +20,18 @@ Operations.createOperation('CSVReader', ['raw'], 'raw_set', (data) => {
     return csvParse(data.raw, {
         auto_parse: true,
         trim: true
+    // filter out any artifacts due to trailing commas
+    }).then((csv_matrix) => {
+        const { rows, cols } = MatDash.dims(csv_matrix);
+        const mat = [];
+        for (let i = 0; i < rows; ++i) {
+            const row = [];
+            for (let j = 0; j < cols; ++j) {
+                if (!(j === cols - 1 && csv_matrix[i][j] === '')) row.push(csv_matrix[i][j]);
+            }
+            mat.push(row);
+        }
+        return mat;
     });
 });
 
