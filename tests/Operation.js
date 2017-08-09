@@ -69,7 +69,5 @@ test('Can merge two graphs into a single chain', async t => {
 
     await g1.execute(data);
 
-    console.log(data)
-
     t.deepEqual(data, { out1: 0, out2: 1, thing: 2, out3: 2 });
 });
