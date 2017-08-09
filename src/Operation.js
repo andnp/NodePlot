@@ -49,6 +49,7 @@ const createOpBuilder = (name, deps, exportTypes, opfunc) => {
             this.name = name;
             this.exportTypes = exportTypes;
             this.dependencies = deps;
+            this.isOperation = true;
 
             // this.backfill = (node) => {
             //     node.dependencies.forEach((dep) => {
@@ -72,6 +73,10 @@ const createOpBuilder = (name, deps, exportTypes, opfunc) => {
                 let Op;
                 if (NextOpClass.isOpBuilder) {
                     Op = NextOpClass(...args);
+                } else if (NextOpClass.isOperation) {
+                    const node = NextOpClass.graph.entry;
+                    this.graph.connect(this.node, node);
+                    return NextOpClass;
                 } else {
                     const builder = createOpBuilder('', [''], [''], NextOpClass);
                     Op = builder(...args);

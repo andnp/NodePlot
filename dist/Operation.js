@@ -76,6 +76,7 @@ var createOpBuilder = function createOpBuilder(name, deps, exportTypes, opfunc) 
             this.name = name;
             this.exportTypes = exportTypes;
             this.dependencies = deps;
+            this.isOperation = true;
 
             // this.backfill = (node) => {
             //     node.dependencies.forEach((dep) => {
@@ -103,6 +104,10 @@ var createOpBuilder = function createOpBuilder(name, deps, exportTypes, opfunc) 
                 var Op = void 0;
                 if (NextOpClass.isOpBuilder) {
                     Op = NextOpClass.apply(undefined, args);
+                } else if (NextOpClass.isOperation) {
+                    var node = NextOpClass.graph.entry;
+                    _this.graph.connect(_this.node, node);
+                    return NextOpClass;
                 } else {
                     var builder = createOpBuilder('', [''], [''], NextOpClass);
                     Op = builder.apply(undefined, args);

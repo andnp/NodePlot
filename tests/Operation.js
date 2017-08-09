@@ -54,3 +54,22 @@ test('Can append anonymous functions as operations', async t => {
 
     t.deepEqual(data, { out1: 0, out2: 1, test: 1 });
 });
+
+test('Can merge two graphs into a single chain', async t => {
+    const data = {};
+
+    const g1 = Operations.baseOp()
+    .and((d) => d.thing = 1);
+
+    const g2 = Operations.secondOp()
+    .and((d) => d.thing++)
+    .and(Operations.thirdOp);
+
+    g1.and(g2);
+
+    await g1.execute(data);
+
+    console.log(data)
+
+    t.deepEqual(data, { out1: 0, out2: 1, thing: 2, out3: 2 });
+});
