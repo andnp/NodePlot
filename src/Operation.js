@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
-import Graph from 'Graph';
+import Graph from '~/Graph';
 
 const Operations = {};
 const ExportTypes = {};
