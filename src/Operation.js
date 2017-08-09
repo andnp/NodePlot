@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
+import Graph from 'Graph';
 
 const Operations = {};
 const ExportTypes = {};
@@ -9,9 +10,6 @@ const addReturn = (data, type, ret) => {
     if (type === 'chart') {
         if (_.isUndefined(data[type])) data[type] = [];
         data[type].push(ret);
-    } else if (type === 'map') {
-        data = {};
-        data.map = ret;
     } else {
         data[type] = ret;
     }
@@ -19,53 +17,75 @@ const addReturn = (data, type, ret) => {
     return data;
 }
 
+// const ancestorExportsDep = (graph, dep) => {
+//     if (graph.exportTypes.includes(dep)) return graph;
+//     if (graph.children.length === 0) return false;
+//     return _.some(graph.children.map((child) => ancestorExportsDep(child, dep)));
+// };
+
 Operations.createOperation = (name, deps, exportTypes, opfunc) => {
     if (typeof exportTypes !== 'object') exportTypes = [exportTypes];
 
-    const operation = function (data, ...args) {
-        const prior_promises = deps.map((dep) => {
-            if (!data[dep]) {
-                // Dependency not met
-                const allPriors = ExportTypes[dep].map((depName) => {
-                    return Operations[depName](data);
-                });
+    const OpBuilder = function (...options) {
+        const Operation = function () {
+            this.graph = new Graph();
+            this.node = this.graph.Node((d) => {
+                return Promise.resolve(opfunc(d, ...options))
+                    .then((op_values) => {
+                        // If there are multiple return values, grab each and add it to the data object
+                        if (exportTypes.length > 1) {
+                            exportTypes.forEach((type, i) => {
+                                d = addReturn(d, type, op_values[i]);
+                            });
+                        } else {
+                            const type = exportTypes[0];
+                            d = addReturn(d, type, op_values);
+                        }
+                        return d;
+                    });
+            });
+            this.name = name;
+            this.exportTypes = exportTypes;
+            this.dependencies = deps;
 
-                return Promise.any(allPriors);
-            }
-            return Promise.resolve();
-        });
+            // this.backfill = (node) => {
+            //     node.dependencies.forEach((dep) => {
+            //         if (!ancestorExportsDep(this, dep)) {
+            //             // TODO: This needs to be chosen in a smarter way.
+            //             // Perhaps I should choose the operation with the minimum depth sub-graph
+            //             const op_name = ExportTypes[dep][0];
+            //             const op = new Operations[op_name]();
+            //             this.backfill(op);
+            //             this.graph.connect(op.node, node.node);
+            //         }
+            //     });
+            // };
+            this.addChild = (node) => {
+                node.graph = this.graph;
+                this.graph.connect(this.node, node.node);
+                // This is where I need to resolve inferred in-between nodes
+                // this.backfill(node);
+            };
+            this.and = (NextOpClass, ...args) => {
+                const Op = new NextOpClass(...args);
+                this.addChild(Op);
+                return Op;
+            };
 
-        // Once all dependencies have been computed, perform this operation
-        return Promise.all(prior_promises).then(() => {
-            return opfunc(data, ...args);
-        }).then((op_values) => {
-            // If there are multiple return values, grab each and add it to the data object
-            if (exportTypes.length > 1) {
-                exportTypes.forEach((type, i) => {
-                    data = addReturn(data, type, op_values[i]);
-                });
-            } else {
-                const type = exportTypes[0];
-                data = addReturn(data, type, op_values);
-            }
+            this.execute = (data) => {
+                return this.graph.execute(data);
+            };
+        };
 
-            return data;
-        })
-        // One of the dependencies failed.
-        .tapCatch((err) => {
-            console.log('Dependency error', err);
-        });
-
+        return new Operation();
     };
 
-    operation.dependencies = deps;
-
-    Operations[name] = operation;
+    Operations[name] = OpBuilder;
     exportTypes.forEach((type) => {
         ExportTypes[type] ? ExportTypes[type].push(name) : ExportTypes[type] = [name];
     });
 
-    return operation;
+    return OpBuilder;
 };
 
 export default Operations;

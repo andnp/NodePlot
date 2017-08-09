@@ -9,7 +9,7 @@ test('LinePlot creates a simple line plot with array data and adds it to a data 
         array: [1, 2, 3, 4, 5]
     };
 
-    await Operations.LinePlot(data);
+    await Operations.LinePlot().execute(data);
 
     t.is(typeof data.chart[0].trace, 'object');
     t.is(typeof data.chart[0].layout, 'object');

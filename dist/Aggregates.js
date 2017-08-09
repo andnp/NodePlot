@@ -10,7 +10,7 @@ var _MatrixUtils2 = _interopRequireDefault(_MatrixUtils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Operation2.default.createOperation('HorizontalAverage', ['matrix', 'rows', 'cols'], 'horizontal_averages', function (data) {
+_Operation2.default.createOperation('HorizontalAverage', ['matrix', 'rows', 'cols'], 'array', function (data) {
     var matrix = data.matrix,
         rows = data.rows,
         cols = data.cols;
@@ -26,7 +26,7 @@ _Operation2.default.createOperation('HorizontalAverage', ['matrix', 'rows', 'col
     return avgs;
 });
 
-_Operation2.default.createOperation('VerticalAverage', ['matrix', 'rows', 'cols'], 'vertical_averages', function (data) {
+_Operation2.default.createOperation('VerticalAverage', ['matrix', 'rows', 'cols'], 'array', function (data) {
     var matrix = data.matrix,
         rows = data.rows,
         cols = data.cols;
@@ -40,12 +40,4 @@ _Operation2.default.createOperation('VerticalAverage', ['matrix', 'rows', 'cols'
         return col / rows;
     });
     return avgs;
-});
-
-_Operation2.default.createOperation('HorizontalAverageToArray', ['horizontal_averages'], 'array', function (data) {
-    return data.horizontal_averages;
-});
-
-_Operation2.default.createOperation('VerticalAverageToArray', ['vertical_averages'], 'array', function (data) {
-    return data.vertical_averages;
 });

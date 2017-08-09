@@ -18,7 +18,7 @@ test(`Map takes a mapped data object and applies an op to each piece of data`, a
         return data;
     };
 
-    await Operations.Map(data, fakeOp);
+    await Operations.Map(fakeOp).execute(data);
 
     _.times(3, (i) => {
         t.is(data.map[i].test, i + 2);
@@ -48,7 +48,7 @@ test(`Append column takes mapped matrices and outputs a single data object with 
         ]
     };
 
-    await Operations.AppendColumn(data);
+    await Operations.AppendColumn().execute(data);
 
     t.deepEqual(data.matrix, expected);
     t.is(data.rows, 2);
@@ -80,7 +80,7 @@ test(`Append row takes mapped matrices and outputs a single data object with mat
         ]
     };
 
-    await Operations.AppendRow(data);
+    await Operations.AppendRow().execute(data);
 
     t.deepEqual(data.matrix, expected);
     t.is(data.rows, 4);

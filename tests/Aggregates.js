@@ -16,9 +16,9 @@ test('HorizontalAverage takes "matrix, rows, cols" and creates "horizontal_avera
         cols: 3
     };
 
-    await Operations.HorizontalAverage(data);
+    await Operations.HorizontalAverage().execute(data);
 
-    t.deepEqual(data.horizontal_averages, [2, 3, 3, 4]);
+    t.deepEqual(data.array, [2, 3, 3, 4]);
 });
 
 // Should be able to compute the average of each col in a matrix
@@ -35,44 +35,7 @@ test('VerticalAverage takes "matrix, rows, cols" and creates "vertical_averages"
         cols: 3
     };
 
-    await Operations.VerticalAverage(data);
-
-    t.deepEqual(data.vertical_averages, [3, 4, 5]);
-});
-
-// Should be able to convert from an aggregate average to an array
-test('HorizontalAverage converts to array', async t => {
-    const data = {
-        matrix: [
-            [1, 2, 3],
-            [2, 3, 4],
-            [1, 3, 5],
-            [1, 4, 7]
-        ],
-        rows: 4,
-        cols: 3
-    };
-    await Operations.HorizontalAverage(data)
-        .then(Operations.HorizontalAverageToArray);
-
-    t.deepEqual(data.array, [2, 3, 3, 4]);
-});
-
-// Should be able to convert from an aggregate average to an array
-test('VerticalAverage converts to array', async t => {
-    const data = {
-        matrix: [
-            [1, 2, 3],
-            [2, 3, 4],
-            [3, 4, 5],
-            [4, 5, 6],
-            [5, 6, 7]
-        ],
-        rows: 5,
-        cols: 3
-    };
-    await Operations.VerticalAverage(data)
-        .then(Operations.VerticalAverageToArray);
+    await Operations.VerticalAverage().execute(data);
 
     t.deepEqual(data.array, [3, 4, 5]);
 });
