@@ -24,7 +24,7 @@ var Operations = {};
 var ExportTypes = {};
 
 var addReturn = function addReturn(data, type, ret) {
-    if (type === '') return;
+    if (type === '') return data;
     if (type === 'chart') {
         if (_lodash2.default.isUndefined(data[type])) data[type] = [];
         data[type].push(ret);
@@ -41,32 +41,38 @@ var addReturn = function addReturn(data, type, ret) {
 //     return _.some(graph.children.map((child) => ancestorExportsDep(child, dep)));
 // };
 
-Operations.createOperation = function (name, deps, exportTypes, opfunc) {
-    if ((typeof exportTypes === 'undefined' ? 'undefined' : _typeof(exportTypes)) !== 'object') exportTypes = [exportTypes];
+var addGraphToOp = function addGraphToOp(context, exportTypes, opfunc) {
+    for (var _len = arguments.length, options = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+        options[_key - 3] = arguments[_key];
+    }
 
+    context.graph = new _Graph2.default();
+    context.node = context.graph.Node(function (d) {
+        return _bluebird2.default.resolve(opfunc.apply(undefined, [d].concat(options))).then(function (op_values) {
+            // If there are multiple return values, grab each and add it to the data object
+            if (exportTypes.length > 1) {
+                exportTypes.forEach(function (type, i) {
+                    d = addReturn(d, type, op_values[i]);
+                });
+            } else {
+                var type = exportTypes[0];
+                d = addReturn(d, type, op_values);
+            }
+            return d;
+        });
+    });
+};
+
+var createOpBuilder = function createOpBuilder(name, deps, exportTypes, opfunc) {
     var OpBuilder = function OpBuilder() {
-        for (var _len = arguments.length, options = Array(_len), _key = 0; _key < _len; _key++) {
-            options[_key] = arguments[_key];
+        for (var _len2 = arguments.length, options = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            options[_key2] = arguments[_key2];
         }
 
         var Operation = function Operation() {
             var _this = this;
 
-            this.graph = new _Graph2.default();
-            this.node = this.graph.Node(function (d) {
-                return _bluebird2.default.resolve(opfunc.apply(undefined, [d].concat(options))).then(function (op_values) {
-                    // If there are multiple return values, grab each and add it to the data object
-                    if (exportTypes.length > 1) {
-                        exportTypes.forEach(function (type, i) {
-                            d = addReturn(d, type, op_values[i]);
-                        });
-                    } else {
-                        var type = exportTypes[0];
-                        d = addReturn(d, type, op_values);
-                    }
-                    return d;
-                });
-            });
+            addGraphToOp.apply(undefined, [this, exportTypes, opfunc].concat(options));
             this.name = name;
             this.exportTypes = exportTypes;
             this.dependencies = deps;
@@ -90,11 +96,17 @@ Operations.createOperation = function (name, deps, exportTypes, opfunc) {
                 // this.backfill(node);
             };
             this.and = function (NextOpClass) {
-                for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                    args[_key2 - 1] = arguments[_key2];
+                for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+                    args[_key3 - 1] = arguments[_key3];
                 }
 
-                var Op = NextOpClass.apply(undefined, args);
+                var Op = void 0;
+                if (NextOpClass.isOpBuilder) {
+                    Op = NextOpClass.apply(undefined, args);
+                } else {
+                    var builder = createOpBuilder('', [''], [''], NextOpClass);
+                    Op = builder.apply(undefined, args);
+                }
                 _this.addChild(Op);
                 return Op;
             };
@@ -106,6 +118,15 @@ Operations.createOperation = function (name, deps, exportTypes, opfunc) {
 
         return new Operation();
     };
+
+    OpBuilder.isOpBuilder = true;
+    return OpBuilder;
+};
+
+Operations.createOperation = function (name, deps, exportTypes, opfunc) {
+    if ((typeof exportTypes === 'undefined' ? 'undefined' : _typeof(exportTypes)) !== 'object') exportTypes = [exportTypes];
+
+    var OpBuilder = createOpBuilder(name, deps, exportTypes, opfunc);
 
     Operations[name] = OpBuilder;
     exportTypes.forEach(function (type) {

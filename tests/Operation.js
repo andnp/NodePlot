@@ -2,17 +2,19 @@ import test from 'ava';
 
 import Operations from 'Operation';
 
-let called = 0;
-Operations.createOperation('baseOp', [], 'out1', (data_) => {
-    return called++;
-});
+test.beforeEach(() => {
+    let called = 0;
+    Operations.createOperation('baseOp', [], 'out1', (data_) => {
+        return called++;
+    });
 
-Operations.createOperation('secondOp', ['out1'], 'out2', (data) => {
-    return data.out1 + 1;
-});
+    Operations.createOperation('secondOp', ['out1'], 'out2', (data) => {
+        return data.out1 + 1;
+    });
 
-Operations.createOperation('thirdOp', ['out2'], 'out3', (data) => {
-    return data.out2 + 1;
+    Operations.createOperation('thirdOp', ['out2'], 'out3', (data) => {
+        return data.out2 + 1;
+    });
 });
 
 // Operations.createOperation('noDep', ['out3'], 'out4', (data) => {
@@ -39,4 +41,16 @@ test('Can chain operations and execute graph multiple times', async t => {
     t.deepEqual(data, { out1: 0, out2: 1, out3: 2 });
     t.deepEqual(data2, { out1: 1, out2: 2, out3: 3 });
     t.deepEqual(data3, { out1: 2, out2: 3, out3: 4 });
+});
+
+test('Can append anonymous functions as operations', async t => {
+    const data = {};
+
+    const comp_graph = Operations.baseOp()
+    .and((d) => d.test = 1)
+    .and(Operations.secondOp);
+
+    await comp_graph.execute(data);
+
+    t.deepEqual(data, { out1: 0, out2: 1, test: 1 });
 });

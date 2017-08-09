@@ -6,7 +6,7 @@ const Operations = {};
 const ExportTypes = {};
 
 const addReturn = (data, type, ret) => {
-    if (type === '') return;
+    if (type === '') return data;
     if (type === 'chart') {
         if (_.isUndefined(data[type])) data[type] = [];
         data[type].push(ret);
@@ -23,27 +23,29 @@ const addReturn = (data, type, ret) => {
 //     return _.some(graph.children.map((child) => ancestorExportsDep(child, dep)));
 // };
 
-Operations.createOperation = (name, deps, exportTypes, opfunc) => {
-    if (typeof exportTypes !== 'object') exportTypes = [exportTypes];
+const addGraphToOp = (context, exportTypes, opfunc, ...options) => {
+    context.graph = new Graph();
+    context.node = context.graph.Node((d) => {
+        return Promise.resolve(opfunc(d, ...options))
+            .then((op_values) => {
+                // If there are multiple return values, grab each and add it to the data object
+                if (exportTypes.length > 1) {
+                    exportTypes.forEach((type, i) => {
+                        d = addReturn(d, type, op_values[i]);
+                    });
+                } else {
+                    const type = exportTypes[0];
+                    d = addReturn(d, type, op_values);
+                }
+                return d;
+            });
+    });
+}
 
+const createOpBuilder = (name, deps, exportTypes, opfunc) => {
     const OpBuilder = function (...options) {
         const Operation = function () {
-            this.graph = new Graph();
-            this.node = this.graph.Node((d) => {
-                return Promise.resolve(opfunc(d, ...options))
-                    .then((op_values) => {
-                        // If there are multiple return values, grab each and add it to the data object
-                        if (exportTypes.length > 1) {
-                            exportTypes.forEach((type, i) => {
-                                d = addReturn(d, type, op_values[i]);
-                            });
-                        } else {
-                            const type = exportTypes[0];
-                            d = addReturn(d, type, op_values);
-                        }
-                        return d;
-                    });
-            });
+            addGraphToOp(this, exportTypes, opfunc, ...options);
             this.name = name;
             this.exportTypes = exportTypes;
             this.dependencies = deps;
@@ -67,7 +69,13 @@ Operations.createOperation = (name, deps, exportTypes, opfunc) => {
                 // this.backfill(node);
             };
             this.and = (NextOpClass, ...args) => {
-                const Op = NextOpClass(...args);
+                let Op;
+                if (NextOpClass.isOpBuilder) {
+                    Op = NextOpClass(...args);
+                } else {
+                    const builder = createOpBuilder('', [''], [''], NextOpClass);
+                    Op = builder(...args);
+                }
                 this.addChild(Op);
                 return Op;
             };
@@ -79,6 +87,15 @@ Operations.createOperation = (name, deps, exportTypes, opfunc) => {
 
         return new Operation();
     };
+
+    OpBuilder.isOpBuilder = true;
+    return OpBuilder;
+};
+
+Operations.createOperation = (name, deps, exportTypes, opfunc) => {
+    if (typeof exportTypes !== 'object') exportTypes = [exportTypes];
+
+    const OpBuilder = createOpBuilder(name, deps, exportTypes, opfunc);
 
     Operations[name] = OpBuilder;
     exportTypes.forEach((type) => {
