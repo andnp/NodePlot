@@ -40,7 +40,7 @@ var Node = function Node(funct) {
         return _bluebird2.default.all(promises);
     };
     this.execute = function (d, visited_nodes) {
-        if (visited_nodes.includes(_this.id)) return _bluebird2.default.resolve();
+        if (visited_nodes.includes(_this.id)) return _bluebird2.default.resolve(d);
         visited_nodes.push(_this.id);
         // Cast output of funct to a promise (regardless of if it was a promise originally)
         var promise = _bluebird2.default.resolve(funct(d)).then(function () {
@@ -76,7 +76,9 @@ var Graph = function Graph() {
 
     this.execute = function (d) {
         var visited_nodes = [];
-        return _this2.entry.execute(d, visited_nodes);
+        return _this2.entry.execute(d, visited_nodes).then(function () {
+            return d;
+        });
     };
 };
 

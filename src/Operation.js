@@ -67,7 +67,7 @@ Operations.createOperation = (name, deps, exportTypes, opfunc) => {
                 // this.backfill(node);
             };
             this.and = (NextOpClass, ...args) => {
-                const Op = new NextOpClass(...args);
+                const Op = NextOpClass(...args);
                 this.addChild(Op);
                 return Op;
             };
