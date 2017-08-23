@@ -12,9 +12,9 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _phantom = require('phantom');
+var _phantomPool = require('phantom-pool');
 
-var _phantom2 = _interopRequireDefault(_phantom);
+var _phantomPool2 = _interopRequireDefault(_phantomPool);
 
 var _imageDataUri = require('image-data-uri');
 
@@ -22,34 +22,53 @@ var _imageDataUri2 = _interopRequireDefault(_imageDataUri);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var plot = async function plot(trace, layout, name) {
-    var instance = await _phantom2.default.create();
-    var page = await instance.createPage();
-    await page.injectJs(require.resolve('d3/d3.min.js'));
-    await page.injectJs(require.resolve('plotly.js/dist/plotly.min.js'));
+var plotly = require.resolve('plotly.js/dist/plotly.min.js');
+var d3 = require.resolve('d3/d3.min.js');
 
-    var outObj = instance.createOutObject();
-    outObj.data_url = '';
-    page.property('onCallback', function (data, out) {
-        out.data_url = data;
-    }, outObj);
+var phantomPool = (0, _phantomPool2.default)({
+    max: 32,
+    min: 2,
+    maxUses: 200
+});
 
-    await page.evaluate(function (trace, layout) {
-        var el = document.createElement('div');
-        document.body.appendChild(el);
+var plot = async function plot(trace, layout, options) {
+    var url = await phantomPool.use(async function (instance) {
+        var page = await instance.createPage();
+        await page.injectJs(d3);
+        await page.injectJs(plotly);
 
-        Plotly.plot(el, [trace], layout, { showLink: false }).then(function (gd) {
-            return Plotly.toImage(gd, { format: 'png', height: 800, width: 800 });
-        }).then(function (url) {
-            window.callPhantom(url);
-        });
-    }, trace, layout);
+        var outObj = instance.createOutObject();
+        // outObj.data_url = '';
+        page.property('onCallback', function (data, out) {
+            if (data) out.data_url = data;
+        }, outObj);
 
-    var url = await outObj.property('data_url');
-    await instance.exit();
+        await page.evaluate(function (trace, layout) {
+            var el = document.createElement('div');
+            document.body.appendChild(el);
 
-    _imageDataUri2.default.outputFile(url, 'plots/' + name + '.png');
+            Plotly.plot(el, [trace], layout, { showLink: false }).then(function (gd) {
+                return Plotly.toImage(gd, { format: 'png', height: 800, width: 800 });
+            }).then(function (url) {
+                window.callPhantom(url);
+            });
+        }, trace, layout);
+
+        await _bluebird2.default.delay(5000);
+        var url = await outObj.property('data_url');
+        return url;
+    });
+
+    var file = options.path + '/' + options.name + '.png';
+    _imageDataUri2.default.outputFile(url, file);
+    return file;
 };
+
+process.on('exit', function () {
+    phantomPool.drain().then(function () {
+        return pool.clear();
+    });
+});
 
 exports.default = {
     plot: plot

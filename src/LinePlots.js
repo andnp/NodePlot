@@ -1,8 +1,9 @@
 import Operations from '~/Operation';
 import _ from 'lodash';
 
-Operations.createOperation('LinePlot', ['array'], 'chart', async (data, name = 'line_plot') => {
+Operations.createOperation('LinePlot', ['array'], 'chart', async (data, static_name = 'line_plot') => {
     const array = data.array;
+    const name = data.name || static_name;
 
     const trace = {
         type: 'scatter',                    // set the chart type

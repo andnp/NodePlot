@@ -5,7 +5,7 @@ import Operations from 'Operation';
 import 'Control';
 
 // Should be able to map an operation to each data point in a mapped object
-test(`Map takes a mapped data object and applies an op to each piece of data`, async t => {
+test(`Map takes a mapped data object and applies a funct to each piece of data`, async t => {
     const data = {
         map: [
             {test: 1},
@@ -19,6 +19,26 @@ test(`Map takes a mapped data object and applies an op to each piece of data`, a
     };
 
     await Operations.Map(fakeOp).execute(data);
+
+    _.times(3, (i) => {
+        t.is(data.map[i].test, i + 2);
+    });
+});
+
+// Should be able to map an operation to each data point in a mapped object
+test(`Map takes a mapped data object and applies an op to each piece of data`, async t => {
+    const data = {
+        map: [
+            { test: 1 },
+            { test: 2 },
+            { test: 3 }
+        ]
+    };
+    Operations.createOperation('mapTest', ['test'], '', (data) => {
+        data.test++;
+    });
+
+    await Operations.Map(Operations.mapTest).execute(data);
 
     _.times(3, (i) => {
         t.is(data.map[i].test, i + 2);

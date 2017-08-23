@@ -4,10 +4,32 @@ import Promise from 'bluebird';
 import MatDash from '~/utils/MatrixUtils';
 import Operations from '~/Operation';
 
-Operations.createOperation('Map', ['map'], 'map', (data, op) => {
+const flattenOnce = (arr) => {
+    const out = [];
+    for (let i = 0; i < arr.length; ++i) {
+        for (let j = 0; j < arr[i].length; ++j) {
+            out.push(arr[i][j]);
+        }
+    }
+    return out;
+}
+
+Operations.createOperation('Map', ['map'], 'map', async (data, op, PROCESSORS = 32) => {
     const array = data.map;
-    const promises = array.map((dat) => op(dat));
-    return Promise.all(promises);
+    op = op.isOpBuilder ? op() : op;
+    const func = op.isOperation ? op.execute : op;
+    if (PROCESSORS > 0) {
+        const chunks = _.chunk(array, PROCESSORS);
+        const results = [];
+        for (let i = 0; i < chunks.length; ++i) {
+            results.push(
+                await Promise.all(chunks[i].map((dat) => func(dat)))
+            );
+        }
+        return flattenOnce(results);
+    }
+
+    return Promise.all(array.map((dat) => func(dat)));
 });
 
 Operations.createOperation('AppendColumn', ['map'], ['matrix', 'rows', 'cols'], (data) => {

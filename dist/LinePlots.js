@@ -11,9 +11,10 @@ var _lodash2 = _interopRequireDefault(_lodash);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _Operation2.default.createOperation('LinePlot', ['array'], 'chart', async function (data) {
-    var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'line_plot';
+    var static_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'line_plot';
 
     var array = data.array;
+    var name = data.name || static_name;
 
     var trace = {
         type: 'scatter', // set the chart type

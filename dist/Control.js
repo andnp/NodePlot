@@ -18,12 +18,35 @@ var _Operation2 = _interopRequireDefault(_Operation);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Operation2.default.createOperation('Map', ['map'], 'map', function (data, op) {
+var flattenOnce = function flattenOnce(arr) {
+    var out = [];
+    for (var i = 0; i < arr.length; ++i) {
+        for (var j = 0; j < arr[i].length; ++j) {
+            out.push(arr[i][j]);
+        }
+    }
+    return out;
+};
+
+_Operation2.default.createOperation('Map', ['map'], 'map', async function (data, op) {
+    var PROCESSORS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 32;
+
     var array = data.map;
-    var promises = array.map(function (dat) {
-        return op(dat);
-    });
-    return _bluebird2.default.all(promises);
+    var func = op.isOperation ? op.execute : op;
+    if (PROCESSORS > 0) {
+        var chunks = _lodash2.default.chunk(array, PROCESSORS);
+        var results = [];
+        for (var i = 0; i < chunks.length; ++i) {
+            results.push((await _bluebird2.default.all(chunks[i].map(function (dat) {
+                return func(dat);
+            }))));
+        }
+        return flattenOnce(results);
+    }
+
+    return _bluebird2.default.all(array.map(function (dat) {
+        return func(dat);
+    }));
 });
 
 _Operation2.default.createOperation('AppendColumn', ['map'], ['matrix', 'rows', 'cols'], function (data) {

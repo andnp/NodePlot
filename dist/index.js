@@ -14,6 +14,8 @@ require('./Aggregates');
 
 require('./LinePlots');
 
+require('./HeatMaps');
+
 require('./Control');
 
 require('./Plotters');
