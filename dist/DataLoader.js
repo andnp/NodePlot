@@ -4,10 +4,6 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _csv = require('csv');
-
-var _csv2 = _interopRequireDefault(_csv);
-
 var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -28,52 +24,40 @@ var _MatrixUtils = require('./utils/MatrixUtils');
 
 var _MatrixUtils2 = _interopRequireDefault(_MatrixUtils);
 
+var _Worker = require('./utils/Worker');
+
+var _Worker2 = _interopRequireDefault(_Worker);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var readFilePromise = _bluebird2.default.promisify(_fs2.default.readFile);
 var writeFilePromise = _bluebird2.default.promisify(_fs2.default.writeFile);
-var csvParse = _bluebird2.default.promisify(_csv2.default.parse);
 var globPromise = _bluebird2.default.promisify(_glob2.default);
 
 _Operation2.default.createOperation('FileLoader', [], 'raw', function (data) {
     return readFilePromise(data.location);
 });
 
-_Operation2.default.createOperation('CSVReader', ['raw'], 'raw_set', function (data) {
-    return csvParse(data.raw, {
-        auto_parse: true,
-        trim: true
-        // filter out any artifacts due to trailing commas
-    }).then(function (csv_matrix) {
-        var _MatDash$dims = _MatrixUtils2.default.dims(csv_matrix),
-            rows = _MatDash$dims.rows,
-            cols = _MatDash$dims.cols;
-
-        var mat = [];
-        for (var i = 0; i < rows; ++i) {
-            var row = [];
-            for (var j = 0; j < cols; ++j) {
-                if (!(j === cols - 1 && csv_matrix[i][j] === '')) row.push(csv_matrix[i][j]);
-            }
-            mat.push(row);
+var parseCsvString = function parseCsvString(str) {
+    var rows = str.split('\n');
+    var mat = [];
+    for (var i = 0; i < rows.length; ++i) {
+        var cols = rows[i].split(',');
+        if (cols.length === 1 && cols[0] === '') continue;
+        var row = [];
+        for (var j = 0; j < cols.length; ++j) {
+            if (!(j === cols.length - 1 && cols[j] === '')) row.push(parseFloat(cols[j]));
         }
-        return mat;
-    });
-});
-
-_Operation2.default.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'cols'], function (data) {
-    var matrix = data.raw_set;
-    var newMatrix = [];
-    var rows = matrix.length;
-    var cols = matrix[0].length;
-    for (var i = 0; i < rows; ++i) {
-        var rowdat = [];
-        for (var j = 0; j < cols; ++j) {
-            rowdat.push(parseFloat(matrix[i][j]));
-        }
-        newMatrix.push(rowdat);
+        mat.push(row);
     }
-    return [newMatrix, rows, cols];
+    return mat;
+};
+var CSVParsePool = (0, _Worker2.default)(parseCsvString);
+
+_Operation2.default.createOperation('CSVReader', ['raw'], 'matrix', function (data) {
+    var buffer = data.raw;
+    var str = buffer.toString();
+    return CSVParsePool.use(str);
 });
 
 _Operation2.default.createOperation('ReadGlob', [], 'map', async function (data) {
@@ -91,9 +75,9 @@ _Operation2.default.createOperation('WriteCSV', ['matrix'], '', async function (
     var str = '';
     var matrix = data.matrix;
 
-    var _MatDash$dims2 = _MatrixUtils2.default.dims(matrix),
-        rows = _MatDash$dims2.rows,
-        cols = _MatDash$dims2.cols;
+    var _MatDash$dims = _MatrixUtils2.default.dims(matrix),
+        rows = _MatDash$dims.rows,
+        cols = _MatDash$dims.cols;
 
     for (var i = 0; i < rows; ++i) {
         for (var j = 0; j < cols; ++j) {

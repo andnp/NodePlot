@@ -31,6 +31,20 @@ var makeArray = function makeArray(size) {
     return array;
 };
 
+var makeMatrix = function makeMatrix(rows, cols) {
+    var v = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+    var matrix = [];
+    for (var i = 0; i < rows; ++i) {
+        var row = [];
+        for (var j = 0; j < cols; ++j) {
+            row.push(v);
+        }
+        matrix.push(row);
+    }
+    return matrix;
+};
+
 var iterateColumns = function iterateColumns(matrix, f) {
     var _dims2 = dims(matrix),
         rows = _dims2.rows,
@@ -80,6 +94,7 @@ exports.default = {
     dims: dims,
     forEach: forEach,
     makeArray: makeArray,
+    makeMatrix: makeMatrix,
     iterateColumns: iterateColumns,
     iterateRows: iterateRows,
     transpose: transpose

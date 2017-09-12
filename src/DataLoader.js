@@ -1,53 +1,40 @@
 import _ from 'lodash';
-import csv from 'csv';
 import fs from 'fs';
 import Promise from 'bluebird';
 import Glob from 'glob';
 
 import Operations from '~/Operation';
 import MatDash from '~/utils/MatrixUtils';
+import createPool from '~/utils/Worker';
 
 const readFilePromise = Promise.promisify(fs.readFile);
 const writeFilePromise = Promise.promisify(fs.writeFile);
-const csvParse = Promise.promisify(csv.parse);
 const globPromise = Promise.promisify(Glob);
 
 Operations.createOperation('FileLoader', [], 'raw', (data) => {
     return readFilePromise(data.location);
 });
 
-Operations.createOperation('CSVReader', ['raw'], 'raw_set', (data) => {
-    return csvParse(data.raw, {
-        auto_parse: true,
-        trim: true
-    // filter out any artifacts due to trailing commas
-    }).then((csv_matrix) => {
-        const { rows, cols } = MatDash.dims(csv_matrix);
-        const mat = [];
-        for (let i = 0; i < rows; ++i) {
-            const row = [];
-            for (let j = 0; j < cols; ++j) {
-                if (!(j === cols - 1 && csv_matrix[i][j] === '')) row.push(csv_matrix[i][j]);
-            }
-            mat.push(row);
+const parseCsvString = (str) => {
+    const rows = str.split('\n');
+    const mat = [];
+    for (let i = 0; i < rows.length; ++i) {
+        const cols = rows[i].split(',');
+        if (cols.length === 1 && cols[0] === '') continue;
+        const row = [];
+        for (let j = 0; j < cols.length; ++j) {
+            if (!(j === cols.length - 1 && cols[j] === '')) row.push(parseFloat(cols[j]));
         }
-        return mat;
-    });
-});
-
-Operations.createOperation('NumericMatrix', ['raw_set'], ['matrix', 'rows', 'cols'], (data) => {
-    const matrix = data.raw_set;
-    const newMatrix = [];
-    const rows = matrix.length;
-    const cols = matrix[0].length;
-    for (let i = 0; i < rows; ++i) {
-        const rowdat = [];
-        for (let j = 0; j < cols; ++j) {
-            rowdat.push(parseFloat(matrix[i][j]));
-        }
-        newMatrix.push(rowdat);
+        mat.push(row);
     }
-    return [newMatrix, rows, cols];
+    return mat;
+};
+const CSVParsePool = createPool(parseCsvString);
+
+Operations.createOperation('CSVReader', ['raw'], 'matrix', (data) => {
+    const buffer = data.raw;
+    const str = buffer.toString();
+    return CSVParsePool.use(str);
 });
 
 Operations.createOperation('ReadGlob', [], 'map', async (data) => {

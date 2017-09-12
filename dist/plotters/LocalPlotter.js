@@ -26,9 +26,10 @@ var plotly = require.resolve('plotly.js/dist/plotly.min.js');
 var d3 = require.resolve('d3/d3.min.js');
 
 var phantomPool = (0, _phantomPool2.default)({
-    max: 32,
+    max: 8,
     min: 2,
-    maxUses: 200
+    maxUses: 200,
+    autostart: false
 });
 
 var plot = async function plot(trace, layout, options) {
@@ -47,7 +48,7 @@ var plot = async function plot(trace, layout, options) {
             var el = document.createElement('div');
             document.body.appendChild(el);
 
-            Plotly.plot(el, [trace], layout, { showLink: false }).then(function (gd) {
+            return Plotly.plot(el, [trace], layout, { showLink: false }).then(function (gd) {
                 return Plotly.toImage(gd, { format: 'png', height: 800, width: 800 });
             }).then(function (url) {
                 window.callPhantom(url);

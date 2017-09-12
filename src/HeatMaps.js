@@ -11,7 +11,7 @@ Operations.createOperation('HeatMap', ['matrix'], 'chart', async (data, options 
     }, options);
 
     const layout = {
-        title: 'Chart Title',
+        title: name,
         yaxis: {
             ticks: ''
         },

@@ -1,5 +1,9 @@
 'use strict';
 
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
@@ -15,5 +19,5 @@ _Operation2.default.createOperation('SavePNG', ['chart'], 'pngs', async function
         return _LocalPlotter2.default.plot(chart.trace, chart.layout, { name: chart.name, path: options.path });
     });
 
-    await Promise.all(promises);
+    await _promise2.default.all(promises);
 });

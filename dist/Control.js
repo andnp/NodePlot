@@ -32,6 +32,7 @@ _Operation2.default.createOperation('Map', ['map'], 'map', async function (data,
     var PROCESSORS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 32;
 
     var array = data.map;
+    op = op.isOpBuilder ? op() : op;
     var func = op.isOperation ? op.execute : op;
     if (PROCESSORS > 0) {
         var chunks = _lodash2.default.chunk(array, PROCESSORS);

@@ -7,9 +7,10 @@ const plotly = require.resolve('plotly.js/dist/plotly.min.js');
 const d3 = require.resolve('d3/d3.min.js');
 
 const phantomPool = createPhantomPool({
-    max: 32,
+    max: 8,
     min: 2,
-    maxUses: 200
+    maxUses: 200,
+    autostart: false
 });
 
 const plot = async (trace, layout, options) => {
@@ -28,7 +29,7 @@ const plot = async (trace, layout, options) => {
             const el = document.createElement('div');
             document.body.appendChild(el);
 
-            Plotly.plot(el, [trace], layout, { showLink: false })
+            return Plotly.plot(el, [trace], layout, { showLink: false })
                 .then((gd) => Plotly.toImage(gd, { format: 'png', height: 800, width: 800 }))
                 .then((url) => {
                     window.callPhantom(url);

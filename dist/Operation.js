@@ -4,7 +4,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
 
 var _bluebird = require('bluebird');
 
@@ -129,7 +131,7 @@ var createOpBuilder = function createOpBuilder(name, deps, exportTypes, opfunc) 
 };
 
 Operations.createOperation = function (name, deps, exportTypes, opfunc) {
-    if ((typeof exportTypes === 'undefined' ? 'undefined' : _typeof(exportTypes)) !== 'object') exportTypes = [exportTypes];
+    if ((typeof exportTypes === 'undefined' ? 'undefined' : (0, _typeof3.default)(exportTypes)) !== 'object') exportTypes = [exportTypes];
 
     var OpBuilder = createOpBuilder(name, deps, exportTypes, opfunc);
 

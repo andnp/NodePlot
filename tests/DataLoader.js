@@ -9,8 +9,6 @@ const checkTestFile = (t, data) => {
             t.is(data.matrix[i][j], (i * 4) + j + 1);
         }
     }
-    t.is(data.rows, 2);
-    t.is(data.cols, 4);
 };
 
 // Should be able to load a file into a buffer
@@ -29,21 +27,8 @@ test('CSVReader reads "raw" and puts the arrays on "raw_set"', async t => {
     await Operations.FileLoader()
         .and(Operations.CSVReader)
         .execute(data);
-    t.is(typeof data.raw_set, 'object');
-    t.true(data.raw_set.length > 0);
-});
-
-test('NumericMatrix parses array of array of strings into floats from "raw_set" to "matrix"', async t => {
-    const data = {};
-    data.raw_set = [
-        ['1', ' 2', '3 ', '4'],
-        ['5', '6.0', '7', '8']
-    ];
-
-    await Operations.NumericMatrix().execute(data);
-    // Parsed data into matrix field
     t.is(typeof data.matrix, 'object');
-    checkTestFile(t, data);
+    t.true(data.matrix.length > 0);
 });
 
 // Should be able to specify each dependency in chain through promises
@@ -53,7 +38,6 @@ test(`Load file, parse csv, parse floats`, async t => {
     };
     await Operations.FileLoader()
         .and(Operations.CSVReader)
-        .and(Operations.NumericMatrix)
         .execute(data)
         .then((data) => checkTestFile(t, data))
 });
@@ -86,7 +70,6 @@ test(`WriteCSV writes a matrix to a csv file`, async t => {
     };
     await Operations.FileLoader()
     .and(Operations.CSVReader)
-    .and(Operations.NumericMatrix)
     .execute(result);
 
     t.deepEqual(matrix, result.matrix);

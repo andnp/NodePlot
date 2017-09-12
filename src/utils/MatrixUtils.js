@@ -21,6 +21,18 @@ const makeArray = (size, v=0) => {
     return array;
 };
 
+const makeMatrix = (rows, cols, v=0) => {
+    const matrix = [];
+    for (let i = 0; i < rows; ++i) {
+        const row = [];
+        for (let j = 0; j < cols; ++j) {
+            row.push(v);
+        }
+        matrix.push(row);
+    }
+    return matrix;
+}
+
 const iterateColumns = (matrix, f) => {
     const { rows, cols } = dims(matrix);
     for (let j = 0; j < cols; ++j) {
@@ -60,6 +72,7 @@ export default {
     dims,
     forEach,
     makeArray,
+    makeMatrix,
     iterateColumns,
     iterateRows,
     transpose

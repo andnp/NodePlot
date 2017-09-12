@@ -1,5 +1,9 @@
 'use strict';
 
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
 var _Operation = require('./Operation');
 
 var _Operation2 = _interopRequireDefault(_Operation);
@@ -16,13 +20,13 @@ _Operation2.default.createOperation('HeatMap', ['matrix'], 'chart', async functi
     var matrix = data.matrix;
     var name = data.name || options.static_name || 'heatmap_plot';
 
-    var trace = Object.assign({
+    var trace = (0, _assign2.default)({
         type: 'heatmap',
         z: matrix
     }, options);
 
     var layout = {
-        title: 'Chart Title',
+        title: name,
         yaxis: {
             ticks: ''
         },
